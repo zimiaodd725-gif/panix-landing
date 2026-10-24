@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panix AI Quant — 让交易，进入系统时代</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0A0A; --panel:#111111; --panel2:#141414; --line:#222222; --line2:#2A2A2A;
+    --text:#EDEAE3; --muted:#8F8A7E; --dim:#5A544A;
+    --amber:#C8A04B; --amber-bright:#E3BE6C; --amber-dim:rgba(200,160,75,.12);
+    --green:#4FA77A; --red:#C96A5E;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:Inter,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+  .mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+  a{color:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+
+  /* ===== 导航 ===== */
+  nav{position:sticky;top:0;z-index:50;background:rgba(10,10,10,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-weight:600;font-size:15px;letter-spacing:-.01em;text-decoration:none}
+  .brand .dot{color:var(--amber)}
+  .nav-links{display:flex;gap:30px}
+  .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .15s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-cta{color:var(--amber);text-decoration:none;font-size:13px;border:1px solid var(--amber);padding:8px 16px;border-radius:4px;transition:all .15s}
+  .nav-cta:hover{background:var(--amber);color:var(--bg)}
+
+  /* ===== Hero ===== */
+  .hero{display:grid;grid-template-columns:1.02fr 1fr;gap:56px;padding:80px 0 56px;align-items:center}
+  .ticker{font-size:11px;color:var(--amber);letter-spacing:.2em;text-transform:uppercase;margin-bottom:20px}
+  .ticker .live{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:9px;vertical-align:1px;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  h1{font-size:46px;line-height:1.1;letter-spacing:-.02em;font-weight:600}
+  h1 em{font-style:normal;color:var(--amber)}
+  .sub{color:var(--muted);font-size:15px;line-height:1.65;margin-top:20px;max-width:440px}
+  .actions{margin-top:32px;display:flex;gap:14px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;font-size:14px;text-decoration:none;padding:13px 24px;border-radius:4px;min-height:44px;transition:all .15s}
+  .btn-solid{background:var(--amber);color:var(--bg);font-weight:600}
+  .btn-solid:hover{background:var(--amber-bright)}
+  .btn-ghost{border:1px solid var(--line2);color:var(--text)}
+  .btn-ghost:hover{border-color:var(--amber);color:var(--amber)}
+
+  /* 净值图 */
+  .chart{border:1px solid var(--line);border-radius:4px;background:var(--panel)}
+  .chart-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .chart-title{font-size:11px;color:var(--dim);letter-spacing:.14em;text-transform:uppercase}
+  .chart-nav{font-size:12px;color:var(--muted)}
+  .chart-nav b{color:var(--amber);font-weight:500}
+  .legend{display:flex;gap:20px;padding:10px 18px;font-size:12px;color:var(--muted)}
+  .legend i{display:inline-block;width:12px;height:2px;vertical-align:3px;margin-right:6px}
+  .legend .eq{background:var(--amber)}
+  .legend .bm{background:var(--dim)}
+
+  /* 指标条 */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:4px;margin-top:48px;overflow:hidden}
+  .stat{padding:22px 24px;border-right:1px solid var(--line);background:var(--panel)}
+  .stat:last-child{border-right:none}
+  .stat .k{font-size:11px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+  .stat .v{font-size:30px;font-weight:600;letter-spacing:-.02em;margin-top:10px}
+  .stat .v.pos{color:var(--green)}
+  .stat .v.neg{color:var(--red)}
+  .stat .n{font-size:12px;color:var(--dim);margin-top:6px}
+
+  /* ===== 通用 section ===== */
+  section.block{padding:80px 0;border-top:1px solid var(--line)}
+  .sec-head{max-width:640px;margin-bottom:48px}
+  .sec-head h2{font-size:32px;line-height:1.2;letter-spacing:-.02em;font-weight:600}
+  .sec-head h2 .amber{color:var(--amber)}
+  .sec-head p{color:var(--muted);font-size:15px;margin-top:16px;line-height:1.65}
+
+  /* ===== 策略记录（信任区） ===== */
+  .record{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .panel{border:1px solid var(--line);border-radius:4px;background:var(--panel);overflow:hidden}
+  .panel-head{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .panel-head .t{font-size:11px;color:var(--dim);letter-spacing:.14em;text-transform:uppercase}
+  .panel-head .r{font-size:12px;color:var(--muted)}
+  .panel-body{padding:20px}
+
+  /* 月度收益表 */
+  table.monthly{width:100%;border-collapse:collapse}
+  table.monthly th{font-size:11px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;text-align:left;font-weight:500;padding:10px 12px;border-bottom:1px solid var(--line2)}
+  table.monthly td{font-size:13px;padding:11px 12px;border-bottom:1px solid var(--line);color:var(--muted)}
+  table.monthly td:first-child{color:var(--text)}
+  table.monthly td.pos{color:var(--green)}
+  table.monthly td.neg{color:var(--red)}
+  table.monthly tr:last-child td{border-bottom:none}
+
+  /* ===== 功能区块 ===== */
+  .feature{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:56px 0}
+  .feature + .feature{border-top:1px solid var(--line)}
+  .feature h3{font-size:24px;font-weight:600;letter-spacing:-.01em}
+  .feature .desc{color:var(--muted);font-size:15px;line-height:1.65;margin-top:14px;max-width:440px}
+  .feature ul{margin-top:20px;list-style:none}
+  .feature li{font-size:14px;color:var(--muted);padding:8px 0 8px 22px;position:relative}
+  .feature li::before{content:"";position:absolute;left:0;top:15px;width:8px;height:1px;background:var(--amber)}
+
+  /* ===== 证言 ===== */
+  .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .quote{border-left:2px solid var(--amber);background:var(--panel);padding:24px;border-radius:0 4px 4px 0}
+  .quote p{font-size:14px;line-height:1.65;color:var(--text)}
+  .quote .who{margin-top:16px;font-size:12px;color:var(--dim)}
+
+  /* ===== 价格 ===== */
+  .pricing{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .tier{border:1px solid var(--line);border-radius:4px;background:var(--panel);padding:24px;display:flex;flex-direction:column}
+  .tier.hot{border-color:var(--amber)}
+  .tier .name{font-size:15px;font-weight:600}
+  .tier .for{font-size:12px;color:var(--dim);margin-top:4px}
+  .tier .price{font-size:28px;font-weight:600;letter-spacing:-.02em;margin-top:20px}
+  .tier ul{list-style:none;margin-top:20px;flex:1}
+  .tier li{font-size:13px;color:var(--muted);padding:6px 0 6px 18px;position:relative}
+  .tier li::before{content:"";position:absolute;left:0;top:13px;width:7px;height:1px;background:var(--dim)}
+  .tier .btn{margin-top:24px;width:100%;min-height:42px}
+
+  /* ===== FAQ ===== */
+  .faq{max-width:760px}
+  details{border:1px solid var(--line);border-radius:4px;background:var(--panel);margin-bottom:12px}
+  details summary{cursor:pointer;list-style:none;padding:18px 20px;font-size:15px;font-weight:500;display:flex;justify-content:space-between;align-items:center;min-height:44px}
+  details summary::after{content:"+";font-family:"JetBrains Mono",monospace;color:var(--amber);font-size:18px;transition:transform .2s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details .a{padding:0 20px 18px;font-size:14px;color:var(--muted);line-height:1.65}
+
+  /* ===== Footer ===== */
+  footer{border-top:1px solid var(--line);padding:80px 0 56px;margin-top:80px}
+  .foot-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:56px}
+  .foot-grid h2{font-size:32px;font-weight:600;letter-spacing:-.02em}
+  .foot-grid h2 .amber{color:var(--amber)}
+  .foot-grid .lead{color:var(--muted);font-size:15px;margin-top:16px;max-width:420px;line-height:1.65}
+  form{display:flex;gap:12px;margin-top:28px;max-width:440px;flex-wrap:wrap}
+  input[type=email]{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line2);border-radius:4px;padding:13px 16px;font-size:14px;color:var(--text);outline:none;transition:border-color .15s}
+  input[type=email]:focus{border-color:var(--amber)}
+  input::placeholder{color:var(--dim)}
+  .brand-info p{font-size:14px;color:var(--muted);line-height:1.65;margin-top:8px}
+  .legal{border-top:1px solid var(--line);margin-top:56px;padding-top:28px;display:flex;justify-content:space-between;gap:24px;font-size:12px;color:var(--dim);line-height:1.7}
+  .legal .disclaimer{max-width:640px}
+
+  #toast{position:fixed;bottom:28px;left:50%;transform:translate(-50%,16px);background:var(--panel);border:1px solid var(--amber);color:var(--text);font-size:13px;padding:14px 22px;border-radius:4px;opacity:0;pointer-events:none;transition:all .25s;z-index:99}
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* ===== 载入动效：净值曲线生长 ===== */
+  .draw{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1.6s ease-out forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .fade-in{opacity:0;animation:fadeIn .8s ease-out forwards}
+  @keyframes fadeIn{to{opacity:1}}
+
+  /* ===== 响应式 ===== */
+  @media(max-width:960px){
+    .hero{grid-template-columns:1fr;gap:40px}
+    .nav-links{display:none}
+    .record,.feature,.foot-grid{grid-template-columns:1fr}
+    .pricing{grid-template-columns:1fr 1fr}
+    .quotes{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+    .stat:nth-child(2){border-right:none}
+    .stat{border-bottom:1px solid var(--line)}
+    .stat:nth-child(3),.stat:nth-child(4){border-bottom:none}
+    h1{font-size:34px}
+    .sec-head h2,.foot-grid h2{font-size:26px}
+  }
+  @media(max-width:600px){
+    .pricing{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr}
+    .stat{border-right:none}
+    .stat:nth-child(3){border-bottom:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 导航 ===== -->
+<nav>
+  <div class="wrap nav">
+    <a class="brand" href="#">PANIX<span class="dot">.</span>QUANT</a>
+    <div class="nav-links">
+      <a href="#record">业绩</a><a href="#strategy">策略</a><a href="#api">执行</a><a href="#risk">风控</a><a href="#pricing">服务</a>
+    </div>
+    <a class="nav-cta" href="#contact">申请接入</a>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<section class="wrap hero">
+  <div>
+    <div class="ticker mono fade-in"><span class="live"></span>Alpha Composite · Live</div>
+    <h1 class="fade-in">让交易，进入<br><em>系统时代</em></h1>
+    <p class="sub fade-in">数据发现机会，策略建立规则，风控守住底线，服务建立信任。用 AI 提升认知效率，用量化建立执行纪律——每一笔决策都有边界、可追溯。</p>
+    <div class="actions fade-in">
+      <a class="btn btn-solid" href="#contact">申请接入</a>
+      <a class="btn btn-ghost" href="#record">查看策略业绩</a>
+    </div>
+  </div>
+
+  <div class="chart fade-in">
+    <div class="chart-head">
+      <span class="chart-title mono">Panix Alpha Composite · Net Value</span>
+      <span class="chart-nav mono">1Y · <b>3Y</b> · ALL</span>
+    </div>
+    <div class="legend">
+      <span><i class="eq"></i>组合净值</span>
+      <span><i class="bm"></i>基准 BTC</span>
+    </div>
+    <svg viewBox="0 0 520 300" style="width:100%;height:auto;display:block">
+      <g stroke="#1c1c1c" stroke-width="1">
+        <line x1="30" y1="40" x2="490" y2="40"/>
+        <line x1="30" y1="100" x2="490" y2="100"/>
+        <line x1="30" y1="160" x2="490" y2="160"/>
+        <line x1="30" y1="220" x2="490" y2="220"/>
+      </g>
+      <path d="M30 210 C 80 200, 110 214, 150 196 S 220 208, 260 186 S 330 192, 370 170 S 440 150, 490 132" fill="none" stroke="#55504A" stroke-width="1.4"/>
+      <path d="M30 236 C 70 226, 100 230, 140 210 S 200 214, 240 182 S 300 190, 340 150 S 400 158, 440 108 S 470 84, 490 64" fill="none" stroke="#C8A04B" stroke-width="2" stroke-linecap="round" class="draw"/>
+      <circle cx="490" cy="64" r="4" fill="#E3BE6C"/>
+      <circle cx="490" cy="64" r="8" fill="none" stroke="#E3BE6C" stroke-opacity="0.3"/>
+      <text x="30" y="28" font-family="JetBrains Mono,monospace" font-size="11" fill="#55504A">2023.01 — 2025.10</text>
+      <text x="490" y="52" font-family="JetBrains Mono,monospace" font-size="13" fill="#E3BE6C" text-anchor="end" font-weight="700">+148.6%</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ===== 指标条 ===== -->
+<div class="wrap">
+  <div class="stats mono">
+    <div class="stat"><div class="k">累计净收益</div><div class="v pos">+148.6%</div><div class="n">回测口径 · 已扣成本</div></div>
+    <div class="stat"><div class="k">最大回撤</div><div class="v neg">−8.4%</div><div class="n">历史最大净值回落</div></div>
+    <div class="stat"><div class="k">夏普比率</div><div class="v">2.10</div><div class="n">年化风险调整后收益</div></div>
+    <div class="stat"><div class="k">月胜率</div><div class="v">68%</div><div class="n">盈利月份占比</div></div>
+  </div>
+</div>
+
+<!-- ===== 策略记录（信任） ===== -->
+<section class="block" id="record">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>长期记录，<span class="amber">透明才配得上信任</span></h2>
+      <p>我们不靠一句承诺建立信任，而是把净值、回撤和风险摆出来。以下为策略长期记录，回测口径，逐月可核对。</p>
+    </div>
+    <div class="record">
+      <div class="panel">
+        <div class="panel-head"><span class="t mono">净值与回撤</span><span class="r mono">2023 — 2025</span></div>
+        <div class="panel-body">
+          <svg viewBox="0 0 460 260" style="width:100%;height:auto;display:block">
+            <g stroke="#1c1c1c" stroke-width="1">
+              <line x1="24" y1="40" x2="440" y2="40"/><line x1="24" y1="95" x2="440" y2="95"/>
+              <line x1="24" y1="150" x2="440" y2="150"/><line x1="24" y1="205" x2="440" y2="205"/>
+            </g>
+            <path d="M24 190 C 60 182, 90 186, 130 168 S 190 172, 230 142 S 290 148, 330 110 S 390 116, 440 78 L440 220 L24 220 Z" fill="rgba(200,160,75,.10)"/>
+            <path d="M24 190 C 60 182, 90 186, 130 168 S 190 172, 230 142 S 290 148, 330 110 S 390 116, 440 78" fill="none" stroke="#C8A04B" stroke-width="2"/>
+            <path d="M24 228 C 70 234, 110 242, 170 236 S 250 250, 310 242 S 380 228, 440 226" fill="none" stroke="#55504A" stroke-width="1.4" stroke-dasharray="4 3"/>
+            <text x="24" y="250" font-family="JetBrains Mono,monospace" font-size="11" fill="#55504A">回撤（倒置）</text>
+          </svg>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="t mono">月度表现</span><span class="r mono">最近 6 个月</span></div>
+        <div class="panel-body" style="padding:8px 0">
+          <table class="monthly">
+            <tr><th>月份</th><th>收益</th><th>回撤</th></tr>
+            <tr><td>2025.05</td><td class="pos">+6.2%</td><td>−1.4%</td></tr>
+            <tr><td>2025.06</td><td class="pos">+4.8%</td><td>−2.1%</td></tr>
+            <tr><td>2025.07</td><td class="neg">−2.3%</td><td>−5.6%</td></tr>
+            <tr><td>2025.08</td><td class="pos">+7.5%</td><td>−1.8%</td></tr>
+            <tr><td>2025.09</td><td class="pos">+5.9%</td><td>−1.2%</td></tr>
+            <tr><td>2025.10</td><td class="pos">+3.4%</td><td>−0.9%</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 功能 1 · 策略透明 ===== -->
+<section class="block" id="strategy" style="border-top:none">
+  <div class="wrap">
+    <div class="feature">
+      <div>
+        <h3>用净值说话</h3>
+        <p class="desc">收益、回撤、仓位与风险状态公开可查。回测与实盘口径明确区分，历史案例与策略逻辑定期复盘——让每一份信任都建立在证据之上。</p>
+        <ul>
+          <li>净值与回撤逐月记录，可核对</li>
+          <li>回测口径明确标注，不与实盘混淆</li>
+          <li>策略逻辑与历史案例公开复盘</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="t mono">策略构成</span><span class="r mono">多因子 · ML</span></div>
+        <div class="panel-body">
+          <svg viewBox="0 0 460 240" style="width:100%;height:auto;display:block">
+            <g stroke="#1c1c1c"><line x1="24" y1="60" x2="440" y2="60"/><line x1="24" y1="120" x2="440" y2="120"/><line x1="24" y1="180" x2="440" y2="180"/></g>
+            <g fill="#C8A04B">
+              <rect x="24" y="48" width="180" height="12"/><rect x="24" y="108" width="120" height="12"/><rect x="24" y="168" width="220" height="12"/>
+            </g>
+            <g fill="#2A2A2A">
+              <rect x="210" y="48" width="120" height="12"/><rect x="150" y="108" width="160" height="12"/><rect x="250" y="168" width="90" height="12"/>
+            </g>
+            <text x="24" y="38" font-family="JetBrains Mono,monospace" font-size="11" fill="#55504A">动量因子</text>
+            <text x="24" y="98" font-family="JetBrains Mono,monospace" font-size="11" fill="#55504A">价值因子</text>
+            <text x="24" y="158" font-family="JetBrains Mono,monospace" font-size="11" fill="#55504A">趋势因子</text>
+            <text x="440" y="214" font-family="JetBrains Mono,monospace" font-size="11" fill="#55504A" text-anchor="end">因子权重 · 定期再平衡</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 功能 2 · API 执行 ===== -->
+<section class="block" id="api">
+  <div class="wrap">
+    <div class="feature">
+      <div class="panel" style="order:2">
+        <div class="panel-head"><span class="t mono">API 权限</span><span class="r mono">只交易 · 不提币</span></div>
+        <div class="panel-body">
+          <div style="border:1px solid var(--line2);border-radius:4px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:14px">交易权限</div><div style="font-size:12px;color:var(--dim)">读取行情 · 下单 · 撤单</div></div>
+            <span class="mono" style="color:var(--green);font-size:12px">已开启</span>
+          </div>
+          <div style="border:1px solid var(--line2);border-radius:4px;padding:16px;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:14px">提币权限</div><div style="font-size:12px;color:var(--dim)">资金始终由你掌控</div></div>
+            <span class="mono" style="color:var(--dim);font-size:12px">未授权</span>
+          </div>
+          <p style="font-size:12px;color:var(--dim);margin-top:14px">首次接入由双人复核，权限变更全程留痕。</p>
+        </div>
+      </div>
+      <div style="order:1">
+        <h3>钱在你手里</h3>
+        <p class="desc">这是 Panix 与多数量化服务的本质区别——我们不碰你的资产。你使用自己的交易所账户，API 只授予交易权限。</p>
+        <ul>
+          <li>账户自持，资金由你掌控，不归集、不代持</li>
+          <li>API 仅交易权限，无提币权限</li>
+          <li>策略信号直连执行，纪律不靠手动盯盘</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 功能 3 · 风控 ===== -->
+<section class="block" id="risk">
+  <div class="wrap">
+    <div class="feature">
+      <div>
+        <h3>先定义风险</h3>
+        <p class="desc">在追求收益之前，先定义能承受多少损失。仓位限额、动态对冲与持续监控，构成每一笔交易的边界。</p>
+        <ul>
+          <li>仓位与风险限额前置，不赌单边</li>
+          <li>净新增利润分成，High-Water Mark 先回补亏损</li>
+          <li>研究、执行、风控职责分离</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="t mono">风控监控</span><span class="r mono"><span style="color:var(--green)">●</span> 运行中</span></div>
+        <div class="panel-body">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+            <div style="border:1px solid var(--line2);border-radius:4px;padding:14px"><div style="font-size:11px;color:var(--dim)" class="mono">最大回撤</div><div style="font-size:22px;font-weight:600;margin-top:6px;color:var(--red)">−8.4%</div></div>
+            <div style="border:1px solid var(--line2);border-radius:4px;padding:14px"><div style="font-size:11px;color:var(--dim)" class="mono">当前仓位</div><div style="font-size:22px;font-weight:600;margin-top:6px">42%</div></div>
+            <div style="border:1px solid var(--line2);border-radius:4px;padding:14px"><div style="font-size:11px;color:var(--dim)" class="mono">监控</div><div style="font-size:22px;font-weight:600;margin-top:6px">24/7</div></div>
+          </div>
+          <p style="font-size:12px;color:var(--dim)">策略准入 · 异常处理 · 费用对账 · 事件台账，全链路留痕。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 证言 ===== -->
+<section class="block">
+  <div class="wrap">
+    <div class="sec-head"><h2>客户怎么说</h2></div>
+    <div class="quotes">
+      <div class="quote"><p>最打动我的是他们把回撤和风险讲在前面，而不是只报收益。接入三个月，每一笔执行和费用都有迹可查。</p><div class="who">独立交易者 · 核心 API 客户</div></div>
+      <div class="quote"><p>钱一直在自己账户里，API 也没有提币权限，这一点让我能放心把执行交给系统。</p><div class="who">机构客户 · 风控负责人</div></div>
+      <div class="quote"><p>从社区到 Pilot 再到核心 API，门槛和权益写得很清楚，没有那种含糊的承诺。</p><div class="who">社区用户 · 已转 Pilot</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 价格 ===== -->
+<section class="block" id="pricing">
+  <div class="wrap">
+    <div class="sec-head"><h2>服务分层</h2><p>不同阶段对应不同服务深度，我们从不对小资金承诺它不该有的东西。</p></div>
+    <div class="pricing">
+      <div class="tier">
+        <div class="name">免费社区</div><div class="for">获取信息与认知</div>
+        <div class="price">免费</div>
+        <ul><li>市场观点与周报</li><li>公开复盘</li><li>风险教育</li></ul>
+        <a class="btn btn-ghost" href="#contact">加入社区</a>
+      </div>
+      <div class="tier">
+        <div class="name">订阅研究</div><div class="for">深度研究，未建立信任</div>
+        <div class="price">订阅制</div>
+        <ul><li>深度研究与策略逻辑</li><li>风险提醒</li><li>不提供自动执行</li></ul>
+        <a class="btn btn-ghost" href="#contact">了解更多</a>
+      </div>
+      <div class="tier">
+        <div class="name">Pilot / Starter</div><div class="for">小额真实执行验证</div>
+        <div class="price">$10k 起</div>
+        <ul><li>小额 API 接入</li><li>有限策略</li><li>标准化支持</li></ul>
+        <a class="btn btn-ghost" href="#contact">申请体验</a>
+      </div>
+      <div class="tier hot">
+        <div class="name">核心 API 客户</div><div class="for">已完成筛选、理解风险</div>
+        <div class="price">$50k 起</div>
+        <ul><li>多策略组合与自动执行</li><li>风险管理与账户级报告</li><li>定期复盘与优先支持</li></ul>
+        <a class="btn btn-solid" href="#contact">申请接入</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="block" id="faq">
+  <div class="wrap">
+    <div class="sec-head"><h2>常见问题</h2></div>
+    <div class="faq">
+      <details><summary>我的资金安全吗？</summary><div class="a">安全的核心在于我们根本不接触资金。你使用自己的交易所账户，API 仅授予交易权限、无提币权限，资金始终由你掌控。</div></details>
+      <details><summary>怎么收费？</summary><div class="a">核心 API 客户只对净新增利润分成，采用 High-Water Mark——先回补亏损、再谈收益。订阅研究是独立标准化产品。</div></details>
+      <details><summary>最低门槛是多少？</summary><div class="a">Pilot / Starter 约 1 万美元起，用于小额真实验证；核心 API 服务从 5 万美元以上开始做分层支持。</div></details>
+      <details><summary>收益有保证吗？</summary><div class="a">没有，也不会有。我们透明展示历史净值与回撤，但不承诺未来收益。数字资产交易存在较高风险。</div></details>
+      <details><summary>怎么开始？</summary><div class="a">留资 → 资格筛选 → 风险说明 → 协议与授权确认 → 交易所账户与 API 权限检查 → 小额试运行 → 定期复盘。</div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer id="contact">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h2>让系统，替你<span class="amber">执行纪律</span></h2>
+        <p class="lead">留下联系方式，我们会先与你确认风险认知与接入门槛，再判断是否适合一起合作。</p>
+        <form onsubmit="return submitForm(event)">
+          <input type="email" required placeholder="你的邮箱或联系方式" aria-label="邮箱">
+          <button type="submit" class="btn btn-solid">提交申请</button>
+        </form>
+      </div>
+      <div class="brand-info">
+        <div class="brand">PANIX<span class="dot">.</span>QUANT</div>
+        <p>Panix Fintech 旗下核心量化产品线，提供 AI 驱动的市场研究辅助、量化策略框架、风险管理与持续服务支持。</p>
+      </div>
+    </div>
+    <div class="legal">
+      <p class="disclaimer">本页面为产品展示。数字资产交易存在较高风险，可能不适合所有投资者；历史业绩不代表未来表现，本页内容不构成任何投资建议、收益承诺或邀约。</p>
+      <p class="mono">© 2025 Panix Fintech</p>
+    </div>
+  </div>
+</footer>
+
+<div id="toast" class="mono">已收到，演示阶段暂未接入后端。</div>
+
+<script>
+// 数字滚动（一次载入）
+function animateNumber(el, target, opts){
+  const start = performance.now(), dur = 1200;
+  function tick(now){
+    const p = Math.min((now-start)/dur, 1);
+    const e = 1 - Math.pow(1-p, 3);
+    const v = target * e;
+    el.textContent = (opts.prefix||'') + (opts.decimals ? v.toFixed(opts.decimals) : Math.round(v)) + (opts.suffix||'');
+    if(p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+animateNumber(document.querySelector('.stat:nth-child(1) .v'), 148.6, {decimals:1, prefix:'+', suffix:'%'});
+animateNumber(document.querySelector('.stat:nth-child(2) .v'), 8.4, {decimals:1, prefix:'−', suffix:'%'});
+animateNumber(document.querySelector('.stat:nth-child(3) .v'), 2.10, {decimals:2});
+
+function submitForm(e){
+  e.preventDefault();
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+  e.target.reset();
+  return false;
+}
+</script>
+</body>
+</html>
