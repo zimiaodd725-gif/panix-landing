@@ -163,7 +163,7 @@
   @keyframes rise{to{opacity:1;transform:none}}
 
   @media(max-width:960px){
-    .hero{grid-template-columns:1fr;gap:40px;padding:96px 24px 48px}
+    .hero{grid-template-columns:1fr;gap:40px;padding:96px 40px 48px}
     .menu-btn{display:flex;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;background:none;border:none;cursor:pointer;padding:0;flex-shrink:0}
     .menu-btn span{width:20px;height:2px;background:var(--text);border-radius:1px;transition:all .2s}
     .nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg);flex-direction:column;gap:0;padding:4px 32px 20px;border-bottom:1px solid var(--line)}
@@ -184,6 +184,7 @@
     .sub,.desc,.lead,.sec-head p,details .a{font-size:16px}
   }
   @media(max-width:600px){
+    .hero{padding:88px 32px 40px}
     .pricing{grid-template-columns:1fr}
     .tier{border-right:none}
     .tier:nth-child(3){border-bottom:1px solid var(--line)}
