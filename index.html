@@ -24,7 +24,7 @@
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{background:var(--bg);color:var(--text);font-family:"Space Grotesk",sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+  body{background:var(--bg);color:var(--text);font-family:"Space Grotesk",sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6;overflow-x:hidden}
   .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
   a{color:inherit}
   ::selection{background:var(--gold);color:var(--bg)}
@@ -36,11 +36,12 @@
   .nav{display:flex;align-items:center;justify-content:space-between;height:60px}
   .brand{font-weight:600;font-size:15px;letter-spacing:-.01em;text-decoration:none}
   .brand .dot{color:var(--gold)}
-  .nav-links{display:flex;gap:30px}
+  .nav-links{display:flex;gap:30px;align-items:center}
   .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .15s}
   .nav-links a:hover{color:var(--text)}
-  .nav-cta{color:var(--gold);text-decoration:none;font-size:13px;border:1px solid var(--gold);padding:8px 16px;border-radius:4px;transition:all .15s}
+  .nav-cta{color:var(--gold);text-decoration:none;font-size:13px;border:1px solid var(--gold);padding:8px 16px;border-radius:4px;transition:all .15s;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
   .nav-cta:hover{background:var(--gold);color:var(--bg)}
+  .menu-btn{display:none}
 
   /* ===== Hero ===== */
   .hero{display:grid;grid-template-columns:1.05fr 1fr;gap:60px;padding:84px 0 60px;align-items:center}
@@ -163,7 +164,12 @@
 
   @media(max-width:960px){
     .hero{grid-template-columns:1fr;gap:40px}
-    .nav-links{display:none}
+    .menu-btn{display:flex;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;background:none;border:none;cursor:pointer;padding:0;flex-shrink:0}
+    .menu-btn span{width:20px;height:2px;background:var(--text);border-radius:1px;transition:all .2s}
+    .nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg);flex-direction:column;gap:0;padding:4px 32px 20px;border-bottom:1px solid var(--line)}
+    .nav-links.open{display:flex}
+    .nav-links a{min-height:48px;display:flex;align-items:center;border-bottom:1px solid var(--line);font-size:15px;width:100%}
+    .nav-links .nav-cta{margin-top:12px;border-bottom:none;justify-content:center}
     .record,.feature,.foot-grid{grid-template-columns:1fr}
     .pricing{grid-template-columns:1fr 1fr}
     .tier:nth-child(2){border-right:none}
@@ -175,6 +181,7 @@
     .stat{border-bottom:1px solid var(--line)}
     .stat:nth-child(3),.stat:nth-child(4){border-bottom:none}
     h1{font-size:38px}
+    .sub,.desc,.lead,.sec-head p,details .a{font-size:16px}
   }
   @media(max-width:600px){
     .pricing{grid-template-columns:1fr}
@@ -190,10 +197,11 @@
 <nav>
   <div class="wrap nav">
     <a class="brand" href="#">PANIX<span class="dot">.</span>QUANT</a>
-    <div class="nav-links">
+    <button class="menu-btn" id="menuBtn" aria-label="菜单" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navMenu">
       <a href="#record">业绩</a><a href="#strategy">策略</a><a href="#api">执行</a><a href="#risk">风控</a><a href="#pricing">服务</a>
+      <a class="nav-cta" href="#contact">申请接入</a>
     </div>
-    <a class="nav-cta" href="#contact">申请接入</a>
   </div>
 </nav>
 
@@ -455,6 +463,20 @@
 <div id="toast" class="mono">已收到，演示阶段暂未接入后端。</div>
 
 <script>
+// 移动端菜单
+const menuBtn = document.getElementById('menuBtn');
+const navMenu = document.getElementById('navMenu');
+menuBtn.addEventListener('click', () => {
+  const open = navMenu.classList.toggle('open');
+  menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+navMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    navMenu.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+  });
+});
+
 function submitForm(e){
   e.preventDefault();
   const t=document.getElementById('toast');
